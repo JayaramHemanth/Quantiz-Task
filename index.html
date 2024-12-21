@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantzig Final Case Study</title>
+    <script src="https://cdn.plot.ly/plotly-2.20.0.min.js"></script>
+    <style>
+        #heapmap{
+            height: 90%;
+            width: 100%;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Heat Map Visualization Using JavaScript + Plotly.js </h1>
+    <div id="heatmap"></div>
+
+    <script>
+        // Fetching data from the assessment.JSON file
+        fetch('assessment.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Extract gaming console names and feature categories
+                const gamingConsoles = data.data.map(item => item.name);
+                const featureCategories = data.data[0].data.map(feature => feature.label);
+
+                // Creation a matrix of ratings
+                const ratingsMatrix = data.data.map(console =>
+                    console.data.map(feature => feature.value)
+                );
+
+                // Ploting the heat map using Plotly
+                const heatmapData = [{
+                    z: ratingsMatrix,
+                    x: featureCategories,
+                    y: gamingConsoles,
+                    type: 'heatmap',
+                    colorscale: [[0,'#f05e00'],[0.5,'#ffc515'],[1,'#fff8e1']], 
+                    colorbar: {
+                        title: 'Ratings',
+                        titleside: 'right'
+                    }
+                }];
+
+                const layout = {
+                    title: 'Gaming Console Features Comparision Heatmap',
+                    xaxis: {
+                        title: 'Feature Categories',
+                        tickangle: -45
+                    },
+                    yaxis: {
+                        title: 'Gaming Consoles Names'
+                    },
+                    margin: {
+                        l: 140, 
+                        r: 50,
+                        t: 50,
+                        b: 100
+                    }
+                };
+
+                Plotly.newPlot('heatmap', heatmapData, layout);
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    </script>
+</body>
+</html>
